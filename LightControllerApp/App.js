@@ -26,10 +26,10 @@ if (!firebase.apps.length) {
   firebase.initializeApp(firebaseConfig);
 }
 
-function readUserData() {
+export function readUserData() {
   firebase
     .database()
-    .ref('deviceList/Bedroom/0')
+    .ref('deviceList/Bedroom')
     .once('value', function(snapshot) {
       console.log(snapshot.val());
     });

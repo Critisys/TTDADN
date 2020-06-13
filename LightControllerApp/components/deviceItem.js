@@ -1,6 +1,13 @@
 import React, {Component} from 'react';
 import {Image, View, StyleSheet, Text, TouchableOpacity} from 'react-native';
-import {selectedList} from '../screens/deviceScreen.js';
+
+export var selectedList = [];
+
+export function toggleState(list) {
+  list.map(element => {
+    element.deviceState = !element.deviceState;
+  });
+}
 
 function removeA(arr) {
   var what,
@@ -53,12 +60,11 @@ class FlatListComponent extends Component {
   render = () => {
     return (
       <TouchableOpacity
+        pointerEvents="box-none"
         style={this.props.deviceState ? styles.itemOn : styles.item}
         onPress={() => this.toggleSelect()}>
         <View>
-          <Text style={styles.title}>
-            {this.props.deviceType} {this.props.deviceID}
-          </Text>
+          <Text style={styles.title}>{this.props.deviceName}</Text>
           {this.renderTick()}
           {/*<Text style={styles.name}>{title.devicePosition}</Text>*/}
         </View>

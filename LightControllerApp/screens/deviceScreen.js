@@ -7,59 +7,40 @@ import {
   TouchableOpacity,
   Image,
 } from 'react-native';
+import * as firebase from 'firebase';
 
 import FlatListComponent from '../components/deviceItem.js';
+import {selectedRoom} from './homeScreen.js';
+import {TouchableWithoutFeedback} from 'react-native-gesture-handler';
 
-var DeviceList = [
-  {
-    deviceID: '01',
-    deviceType: 'Light',
-    deviceState: false,
-    deviceRoom: '101',
-  },
-  {
-    deviceID: '02',
-    deviceType: 'Light',
-    deviceState: true,
-    deviceRoom: '101',
-  },
-  {
-    deviceID: '03',
-    deviceType: 'Light',
-    deviceState: true,
-    deviceRoom: '101',
-  },
-  {
-    deviceID: '04',
-    deviceType: 'Light',
-    deviceState: false,
-    deviceRoom: '101',
-  },
-  {
-    deviceID: '05',
-    deviceType: 'Sensor',
-    deviceState: false,
-    deviceRoom: '101',
-  },
-  {
-    deviceID: '06',
-    deviceType: 'Light',
-    deviceState: false,
-    deviceRoom: '101',
-  },
-  {
-    deviceID: '07',
-    deviceType: 'Sensor',
-    deviceState: false,
-    deviceRoom: '101',
-  },
-];
+const firebaseConfig = {
+  apiKey: 'AIzaSyADawFZYkBiSUoh5bdWpescXF0V2DvDvvk',
+  authDomain: 'lightappdemo-dc252.firebaseapp.com',
+  databaseURL: 'https://lightappdemo-dc252.firebaseio.com',
+  projectId: 'lightappdemo-dc252',
+  storageBucket: 'lightappdemo-dc252.appspot.com',
+  messagingSenderId: '670980151251',
+  appId: '1:670980151251:web:245ac428bec24de86a0126',
+};
 
-export var selectedList = [];
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
 
 class deviceScreen extends React.Component {
   state = {
     showControlMode: false,
+    DeviceList: [],
+  };
+
+  readDeviceData = () => {
+    firebase
+      .database()
+      .ref('deviceList/' + selectedRoom)
+      .once('value')
+      .then(snapshot => {
+        this.setState({DeviceList: snapshot.val()});
+      });
   };
 
   toggleControl = () => {
@@ -96,21 +77,25 @@ class deviceScreen extends React.Component {
   };
 
   render = () => {
+    this.readDeviceData();
     return (
-      <View>
+      <View style={styles.container}>
         <View style={styles.headContainer}>
           <View style={styles.headButton}>
-            <Button title="Action" />
+            <Button title={selectedRoom} />
           </View>
         </View>
-        <FlatList
-          data={DeviceList}
-          keyExtractor={item => item.deviceID}
-          style={{marginBottom: 50}}
-          renderItem={({item}) => {
-            return <FlatListComponent {...item} />;
-          }}
-        />
+        <TouchableWithoutFeedback>
+          <FlatList
+            pointerEvents={'box-none'}
+            data={this.state.DeviceList}
+            keyExtractor={item => item.deviceID}
+            style={{marginBottom: 50}}
+            renderItem={({item}) => {
+              return <FlatListComponent {...item} />;
+            }}
+          />
+        </TouchableWithoutFeedback>
         {this.renderControlButton()}
         <View>
           <TouchableOpacity
@@ -233,7 +218,6 @@ const styles = StyleSheet.create({
     height: 36,
     width: '100%',
     maxWidth: 450,
-    marginBottom: 35,
   },
   bottomButtonContainer: {
     flex: 1,
